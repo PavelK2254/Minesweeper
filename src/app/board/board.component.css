@@ -1,0 +1,23 @@
+main{
+  height: 90%;
+  padding-top: 2%;
+}
+
+.board{
+    width: 40%;
+    margin: 0% auto;
+    height: 85%;
+
+}
+
+.board-content-field{
+  background: lightgray;
+    width: 100%;
+    min-height: 380px;
+    padding-bottom: 0px !important;
+    overflow-y: auto;
+}
+
+button{
+      margin-left: 5%;
+}

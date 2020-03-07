@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  API_BASE_URL: "wss://hometask.eg1236.com/game1/",
+  API_TEST_URL: "ws://echo.websocket.org/"
 };
 
 /*

@@ -1,0 +1,25 @@
+<main>
+  <mat-card class="board">
+    <mat-card-title>
+      {{gameStatusTitle}}
+    </mat-card-title>
+    <mat-card-subtitle style="margin-top:0">
+      <mat-form-field>
+        <mat-label>Current level:</mat-label>
+        <mat-select [(value)]="currentLevel">
+          <mat-option *ngFor="let level of levels" [value]="level.value" >
+            {{level.viewValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="accent" (click)="this.gameService.getNewLevel(this.currentLevel)" [disabled]="this.currentLevel == this.gameService.requestedLevel">New level</button>
+      <button mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
+    </mat-card-subtitle>
+    <mat-card-content>
+      <mat-grid-list cols="10" rowHeight="1:1" class="board-content-field">
+        <mat-grid-tile *ngFor="let item of items; let i=index"><app-tile></app-tile></mat-grid-tile>
+      </mat-grid-list>
+
+    </mat-card-content>
+  </mat-card>
+</main>

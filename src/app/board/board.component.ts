@@ -27,7 +27,7 @@ export class BoardComponent implements OnInit {
   items = new Array();
 
   constructor(private gameService:GameService) {
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 200; i++) {
         this.items.push(i);
     }
    }

@@ -19,11 +19,8 @@ export class TileComponent implements OnInit {
 
   ngOnInit() {
     console.log('init')
-    this.tileLabel = this.tileLabel.replace('□', '');
-    this.tileLabel = this.tileLabel.replace('M', '');
-
   }
 
-  
+
 
 }

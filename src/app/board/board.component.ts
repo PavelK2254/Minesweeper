@@ -49,13 +49,13 @@ export class BoardComponent implements OnInit {
   }
 
   flagMine(event) {
-
-    event.target.style.background = 'red';
-
-
+    event.target.classList.toggle('redBackground')
     this.gameService.getMap();
     return false;
   }
 
+  trackFn(index,item){
+    console.log(item)
+  }
 
 }

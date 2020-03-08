@@ -1,4 +1,4 @@
 <mat-card  [attr.coordinate-x]="x" [attr.coordinate-y]="y">
-  <p style="color:black">{{tileLabel}}</p>
+  <p style="color:black">{{tileLabel | tileCleaner}}</p>
   <p *ngIf="this.gameService.testMode" class="coordinates" >{{x}},{{y}}</p>
 </mat-card>

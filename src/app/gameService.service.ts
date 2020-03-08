@@ -35,7 +35,7 @@ export class GameService {
 
   parseMapData(mapData: string) {
   //  this.busy = true;
-    this.rowsArray = new Array<string>();
+    this.rowsArray.length = 0;
     this.rowsArray = mapData.split("\n");
     this.rowsArray.shift()
     this.rowsArray.pop()
@@ -73,17 +73,18 @@ public resetGame():void{
 }
 
 public parseMessage(message:string):void{
-  console.log(message)
-  if(message.indexOf("new") >= 0){
 
+  if(message.indexOf("new") >= 0){
+    console.log(message)
   }else if(message.indexOf("□") >= 0){
-    this.parseMapData(message);
+  this.parseMapData(message);
   }else if(message.indexOf("open") >= 0){
     this.wsService.sendMessage('map');
     if(message.indexOf("lose") >= 0){
+      console.log(message)
       this.resetGame();
     }else if(message.indexOf("You win") >= 0){
-
+      console.log(message)
     }
   }
 }

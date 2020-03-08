@@ -11,11 +11,11 @@ main{
 }
 
 .board-content-field{
-  background: lightgray;
+  background: darkgrey;
     width: 100%;
     min-height: 380px;
     padding-bottom: 0px !important;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 button{

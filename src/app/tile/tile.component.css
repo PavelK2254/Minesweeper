@@ -13,3 +13,7 @@ mat-card:hover {
   color: black;
   font-size: 0.5em
 }
+
+.redBackground{
+  background: red;
+}

@@ -1,23 +1,26 @@
 <main>
+  <mat-spinner *ngIf="this.gameService.busy"></mat-spinner>
   <mat-card class="board">
     <mat-card-title>
-      {{gameStatusTitle}}
+      {{this.gameService.gameStatusTitle}}
     </mat-card-title>
     <mat-card-subtitle style="margin-top:0">
       <mat-form-field>
         <mat-label>Current level:</mat-label>
         <mat-select [(value)]="currentLevel">
-          <mat-option *ngFor="let level of levels" [value]="level.value" >
+          <mat-option *ngFor="let level of levels" [value]="level.value">
             {{level.viewValue}}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <button mat-raised-button color="accent" (click)="this.gameService.getNewLevel(this.currentLevel)" [disabled]="this.currentLevel == this.gameService.requestedLevel">New level</button>
-      <button mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
+      <button *ngIf="this.gameService.testMode"  mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
     </mat-card-subtitle>
     <mat-card-content>
       <mat-grid-list [cols]="this.gameService.getMapHeight()" rowHeight="1:1" class="board-content-field">
-        <mat-grid-tile *ngFor="let tile of this.gameService.getTilesArray(); let i=index"><app-tile [tileCoordinate]="tile"></app-tile></mat-grid-tile>
+        <mat-grid-tile class="tile" *ngFor="let tile of this.gameService.getTilesArray(); index as i;" >
+          <app-tile  (click)="openTile(i)"  [coordinate-x]="getTileX(i)" [coordinate-y]="getTileY(i)"  [tileLabel]="tile" (contextmenu)="flagMine($event)"></app-tile>
+        </mat-grid-tile>
       </mat-grid-list>
 
     </mat-card-content>

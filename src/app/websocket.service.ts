@@ -17,9 +17,8 @@ myWebSocket: WebSocketSubject<string> = webSocket(this.WEBSOCKET_CONFIG);
 gameService:GameService;
 
   public initSocket(gameService:GameService):void{
-    this.gameService = gameService;
     this.myWebSocket.asObservable().subscribe(
-       msg => this.parseMessage(msg),
+       msg => gameService.parseMessage(msg),
        // Called whenever there is a message from the server
        err => console.log(JSON.stringify(err)),
        // Called if WebSocket API signals some kind of error
@@ -33,11 +32,4 @@ gameService:GameService;
     this.myWebSocket.next(message);
   }
 
-  private parseMessage(message:string):void{
-    if(message.indexOf("new") >= 0){
-
-    }else if(message.indexOf("□") >= 0){
-      this.gameService.parseMapData(message);
-    }
-  }
 }

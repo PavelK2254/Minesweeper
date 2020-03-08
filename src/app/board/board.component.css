@@ -4,9 +4,9 @@ main{
 }
 
 .board{
-    width: 40%;
+    width: 50%;
     margin: 0% auto;
-    height: 85%;
+    height: auto;
 
 }
 
@@ -20,4 +20,11 @@ main{
 
 button{
       margin-left: 5%;
+}
+
+mat-spinner{
+  position: absolute;
+    top: 50%;
+    left: 47%;
+    z-index: 1;
 }

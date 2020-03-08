@@ -8,3 +8,8 @@ mat-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 
 }
+
+.coordinates{
+  color: black;
+  font-size: 0.5em
+}

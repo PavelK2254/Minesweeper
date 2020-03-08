@@ -1,5 +1,5 @@
-import { Component, OnInit,Input } from '@angular/core';
-
+import { Component, OnInit, Input } from '@angular/core';
+import { GameService } from '../gameService.service';
 
 
 @Component({
@@ -9,12 +9,21 @@ import { Component, OnInit,Input } from '@angular/core';
 })
 export class TileComponent implements OnInit {
 
-@Input()
-tileCoordinate
+  @Input() tileLabel: string;
+  @Input('coordinate-x') x: number;
+  @Input('coordinate-y') y: number;
 
-  constructor() { }
+  constructor(private gameService: GameService) {
+
+  }
 
   ngOnInit() {
+    console.log('init')
+    this.tileLabel = this.tileLabel.replace('□', '');
+    this.tileLabel = this.tileLabel.replace('M', '');
+
   }
+
+  
 
 }

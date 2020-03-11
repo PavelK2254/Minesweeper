@@ -14,6 +14,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TileCleanerPipe } from './tile-cleaner.pipe';
+import {MatListModule} from '@angular/material/list';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { TileCleanerPipe } from './tile-cleaner.pipe';
     MatRadioModule,
     MatGridListModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

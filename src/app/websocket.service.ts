@@ -14,7 +14,7 @@ export class WebsocketService {
   serializer: (value: any) => value,
 };
 myWebSocket: WebSocketSubject<string> = webSocket(this.WEBSOCKET_CONFIG);
-gameService:GameService;
+
 
   public initSocket(gameService:GameService):void{
     this.myWebSocket.asObservable().subscribe(

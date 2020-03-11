@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from '../gameService.service';
+import { GamesolverService } from '../gamesolver.service';
 
 interface Level {
   value: string;
@@ -23,9 +24,13 @@ export class BoardComponent implements OnInit {
     { value: '3', viewValue: 'Level 3' },
     { value: '4', viewValue: 'Level 4' }
   ];
-  currentLevel = 1;
 
-  constructor(private gameService: GameService) {
+
+  currentLevel: number = 1;
+  autoSolveStatus:string = "autoSolve";
+
+
+  constructor(private gameService: GameService, private gamesolver: GamesolverService) {
 
   }
 
@@ -35,27 +40,52 @@ export class BoardComponent implements OnInit {
 
 
 
-  getTileX(currentIndex: number): number {
-    return currentIndex % this.gameService.getMapHeight();
+
+
+  openTile(element: any) {
+    if (typeof element == "number") {
+      console.log(`Clicked on X: ${this.gameService.getTileX(element)} Y: ${this.gameService.getTileY(element)}`)
+      this.gameService.openTile(this.gameService.getTileX(element), this.gameService.getTileY(element));
+    } else {
+      console.log(`Index: ${this.getSelectionPosition()} X: ${this.gameService.getTileX(this.getSelectionPosition())} Y: ${this.gameService.getTileY(this.getSelectionPosition())}`);
+      element = this.getSelectionPosition();
+      var x: number;
+      if (this.gameService.getTileY(element) > 0) {
+        x = this.gameService.getTileX(element) - (this.gameService.getTileY(element))
+      } else {
+        x = this.gameService.getTileX(element)
+      }
+      this.gameService.openTile(x, this.gameService.getTileY(element));
+    }
   }
 
-  getTileY(currentIndex: number): number {
-    return Math.floor(currentIndex / this.gameService.getMapHeight());
-  }
 
-  openTile(element: number) {
-    console.log(`Clicked on X: ${this.getTileX(element)} Y: ${this.getTileY(element)}`)
-    this.gameService.openTile(this.getTileX(element), this.getTileY(element));
-  }
 
   flagMine(event) {
     event.target.classList.toggle('redBackground')
-    this.gameService.getMap();
+  //  this.gameService.getMap();
     return false;
   }
 
-  trackFn(index,item){
-    console.log(item)
+  trackFn(index: number, item: string) {
+
   }
 
+  getSelectionPosition(): number {
+    var selection = window.getSelection();
+    return selection.focusOffset - 1;
+  }
+
+  autoSolve() {
+    /*if(this.gameService.getPlainText()){
+    this.gamesolver.autoSolve(this.gameService.getPlainText().length / 2);
+    }else{
+      this.gamesolver.autoSolve(this.gameService.getTilesArray().length / 2);
+    }
+  }*/
+
+    this.gamesolver.autoSolve(0);
+
+
+  }
 }

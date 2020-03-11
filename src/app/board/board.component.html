@@ -14,14 +14,22 @@
         </mat-select>
       </mat-form-field>
       <button mat-raised-button color="accent" (click)="this.gameService.getNewLevel(this.currentLevel)" [disabled]="this.currentLevel == this.gameService.requestedLevel">New level</button>
-      <button *ngIf="this.gameService.testMode"  mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
+      <button *ngIf="this.gameService.testMode" mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
+      <button  mat-raised-button color="accent" (click)="this.autoSolve()">Auto Solve</button>
+      <mat-list class="passwords" role="list">Passwords:
+        <mat-list-item *ngFor="let password of this.gameService.passwords" role="listitem">{{password}}</mat-list-item>
+      </mat-list>
     </mat-card-subtitle>
     <mat-card-content>
-      <mat-grid-list [cols]="this.gameService.getMapHeight()" rowHeight="1:1" class="board-content-field">
+      <mat-grid-list *ngIf="currentLevel <= 2" [cols]="this.gameService.getMapHeight()" rowHeight="1:1" class="board-content-field">
         <mat-grid-tile class="tile" *ngFor="let tile of this.gameService.getTilesArray(); index as i; trackBy: trackFn">
-          <app-tile  (click)="openTile(i)"  [coordinate-x]="getTileX(i)" [coordinate-y]="getTileY(i)"  [tileLabel]="tile" (contextmenu)="flagMine($event)"></app-tile>
+          <app-tile (click)="openTile(i)" [coordinate-x]="this.gameService.getTileX(i)" [coordinate-y]="this.gameService.getTileY(i)" [tileLabel]="tile" (contextmenu)="flagMine($event)"></app-tile>
         </mat-grid-tile>
       </mat-grid-list>
+
+      <article (click)="openTile($event)" *ngIf="currentLevel > 2" class="plainTextHolder">
+        {{this.gameService.getPlainText()}}
+      </article>
 
     </mat-card-content>
   </mat-card>

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   API_BASE_URL: "wss://hometask.eg1236.com/game1/",
-  API_TEST_URL: "ws://echo.websocket.org/"
+  API_TEST_URL: "ws://echo.websocket.org/",
 };
 
 /*

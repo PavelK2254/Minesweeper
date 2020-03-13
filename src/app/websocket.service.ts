@@ -20,12 +20,12 @@ myWebSocket: WebSocketSubject<string> = webSocket(this.WEBSOCKET_CONFIG);
     this.myWebSocket.asObservable().subscribe(
        msg => gameService.parseMessage(msg),
        // Called whenever there is a message from the server
-       err => console.log(JSON.stringify(err)),
+       err => console.error(JSON.stringify(err)),
        // Called if WebSocket API signals some kind of error
        () => console.log('complete')
        // Called when connection is closed (for whatever reason)
     );
-    this.sendMessage(API.API_TEST_MESSAGE);
+    this.sendMessage(API.API_HELP_MESSAGE);
   }
 
   public sendMessage(message:string):void{

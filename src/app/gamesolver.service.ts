@@ -46,10 +46,10 @@ class CellData {
     this.X = gameService.getTileX(gamesolver.getCurrentIndex())
     this.Y = gameService.getTileY(gamesolver.getCurrentIndex())
 
-    /*console.log(`X: ${this.X} Y: ${this.Y}
+    console.log(`X: ${this.X} Y: ${this.Y}
       \n UL: ${this.UL} U: ${this.U} UR: ${this.UR}\n
     L: ${this.L} Self: ${this.SELF} R: ${this.R}\n
-    DL: ${this.DL} D: ${this.D} DR: ${this.DR}`)*/
+    DL: ${this.DL} D: ${this.D} DR: ${this.DR}`)
   }
 
   checkR(currentIndex: number, heightFactor: number): number {
@@ -127,7 +127,7 @@ class CellData {
   }
 
   hasMinesAround = (): boolean => {
-    return this.sumOfUnopened() == this.SELF;
+    return (this.sumOfUnopened() == this.SELF && this.SELF > 0);
   }
 
   getUnopenedTiles(): Array<number> {
@@ -173,50 +173,88 @@ export class GamesolverService {
   currentIndex: number;
   getColumnsCount = (): number => { return this.heightFactor };
   getCurrentIndex = (): number => { return this.currentIndex };
+  stop = false
 
 
   constructor(private gameService: GameService) { }
 
-  autoSolve(currentIndex: number) {
+  autoSolve(currentIndex: number,openNextAvaiable:boolean,level:number) {
+    this.gameService.isLost;
+    this.stop = !this.gameService.autoSolveWorking;
+    if(this.stop){
+      this.gameService.busy = false;
+      return;
+    }else if(this.gameService.isLost){
+      this.gameService.busy = false;
+      this.requestRestart(level);
+      return;
+    }else if(this.gameService.isWon){
+      this.gameService.busy = false;
+      return;
+    }
+    var tilesOpened = false;
 
-    console.log("Auto Solving")
     this.gameService.busy = true;
     this.currentIndex = currentIndex;
-    var lost = this.gameService.requestedLevel === 0
-    if (lost || currentIndex >= this.gameService.tiles.length) {
-      this.gameService.busy = false;
-      return
-    }
+      var currentCell = new CellData(this, this.gameService);
+
+
     this.heightFactor = this.gameService.getMapHeight();
-    var currentCell = new CellData(this, this.gameService);
+
     if (currentCell.SELF > 0 && currentCell.SELF - currentCell.getFlaggedTiles().length == 0) {
       currentCell.getUnopenedTiles().forEach((item, index, arr) => {
         if (currentCell.getFlaggedTiles().indexOf(item) < 0 && Number.isNaN(this.gameService.getTileValue(item))) {
           //  console.log(`Opening X: ${this.gameService.getTileX(item)}\n Y: ${this.gameService.getTileY(item)}`)
           this.gameService.openTile(this.gameService.getTileX(item), this.gameService.getTileY(item));
           if (index === arr.length - 1) {
-            this.autoSolve(0);
-          }
+          tilesOpened = true;
+        }
         }
       })
-
     } else if (currentCell.hasMinesAround()) {
       currentCell.getUnopenedTiles().forEach((item) => {
-        if (!this.gameService.isTileFlagged(item)) this.gameService.flagMine(item);
+        if (!this.gameService.isTileFlagged(item)){
+          this.gameService.flagMine(item);
+          tilesOpened = true;
+        }
       })
+    } else if (openNextAvaiable){
+      if(Number.isNaN(currentCell.SELF) && currentCell.getFlaggedTiles().indexOf(currentIndex) < 0){
+        this.gameService.openTile(this.gameService.getTileX(currentIndex), this.gameService.getTileY(currentIndex));
+        tilesOpened = true;
+      }
     }
 
-    setTimeout(() => {
-      this.autoSolve(currentIndex + 1)
-    }, 10);
-
-
-
-
+    console.log(`Auto Solving - tile opened: ${tilesOpened}`)
+    if(tilesOpened){
+      setTimeout(() => {
+        this.autoSolve(0,false,level);
+      }, 4);
+    }else if(openNextAvaiable){
+      setTimeout(() => {
+        this.autoSolve(currentIndex + 1,true,level)
+      }, 4);
+    }else{
+      if (currentIndex >= this.gameService.getTilesArray().length) {
+       this.autoSolve(0,true,level);
+    //  this.gameService.busy = false;
+      return
+    }else{
+      setTimeout(() => {
+        this.autoSolve(currentIndex + 1,false,level)
+      }, 4);
+    }
+    }
   }
 
+  requestRestart(level:number){
+    this.gameService.getNewLevel(level);
+    setTimeout(() => {
+      this.autoSolve(0,false,level)
+    },1000)
+  }
 
-
-
-
+  stopSolving(){
+    this.stop = true;
+  }
 }

@@ -15,7 +15,7 @@
       </mat-form-field>
       <button mat-raised-button color="accent" (click)="this.gameService.getNewLevel(this.currentLevel)" [disabled]="this.currentLevel == this.gameService.requestedLevel">New level</button>
       <button *ngIf="this.gameService.testMode" mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
-      <button  mat-raised-button color="accent" (click)="this.autoSolve()">Auto Solve</button>
+      <button  mat-raised-button color="accent" (click)="this.toggleAutoSolve()">{{autoSolveStatus}}</button>
       <mat-list class="passwords" role="list">Passwords:
         <mat-list-item *ngFor="let password of this.gameService.passwords" role="listitem">{{password}}</mat-list-item>
       </mat-list>
@@ -27,7 +27,7 @@
         </mat-grid-tile>
       </mat-grid-list>
 
-      <article (click)="openTile($event)" *ngIf="currentLevel > 2" class="plainTextHolder">
+      <article (contextmenu)="flagMine($event)" (click)="openTile($event)" *ngIf="currentLevel > 2" class="plainTextHolder">
         {{this.gameService.getPlainText()}}
       </article>
 

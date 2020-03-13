@@ -27,7 +27,7 @@ export class BoardComponent implements OnInit {
 
 
   currentLevel: number = 1;
-  autoSolveStatus:string = "autoSolve";
+  autoSolveStatus:string = "Auto Solve";
 
 
   constructor(private gameService: GameService, private gamesolver: GamesolverService) {
@@ -35,7 +35,7 @@ export class BoardComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    console.log("init board")
   }
 
 
@@ -62,9 +62,16 @@ export class BoardComponent implements OnInit {
 
 
   flagMine(event) {
+    if(this.currentLevel <=2){
     event.target.classList.toggle('redBackground')
   //  this.gameService.getMap();
-    return false;
+
+  }else{
+    var currentTileIndex = this.getSelectionPosition();
+    if(this.gameService.flaggedTileIndexes.indexOf(currentTileIndex) < 0)
+    this.gameService.flaggedTileIndexes.push(currentTileIndex)
+  }
+  return false;
   }
 
   trackFn(index: number, item: string) {
@@ -76,16 +83,16 @@ export class BoardComponent implements OnInit {
     return selection.focusOffset - 1;
   }
 
-  autoSolve() {
-    /*if(this.gameService.getPlainText()){
-    this.gamesolver.autoSolve(this.gameService.getPlainText().length / 2);
+  toggleAutoSolve() {
+    if(this.gameService.autoSolveWorking){
+      this.gameService.autoSolveWorking = false
+      this.autoSolveStatus = "Auto Solve";
+      this.gamesolver.stopSolving();
     }else{
-      this.gamesolver.autoSolve(this.gameService.getTilesArray().length / 2);
+      this.gameService.autoSolveWorking = true
+    this.autoSolveStatus = "Stop";
+    this.gamesolver.autoSolve(0,false,this.gameService.requestedLevel);
     }
-  }*/
-
-    this.gamesolver.autoSolve(0);
-
 
   }
 }

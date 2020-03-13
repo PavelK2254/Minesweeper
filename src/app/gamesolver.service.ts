@@ -46,7 +46,7 @@ class CellData {
     this.X = gameService.getTileX(gamesolver.getCurrentIndex())
     this.Y = gameService.getTileY(gamesolver.getCurrentIndex())
 
-    console.log(`X: ${this.X} Y: ${this.Y}
+  if(this.gameService.testMode)  console.log(`X: ${this.X} Y: ${this.Y}
       \n UL: ${this.UL} U: ${this.U} UR: ${this.UR}\n
     L: ${this.L} Self: ${this.SELF} R: ${this.R}\n
     DL: ${this.DL} D: ${this.D} DR: ${this.DR}`)
@@ -225,7 +225,7 @@ export class GamesolverService {
       }
     }
 
-    console.log(`Auto Solving - tile opened: ${tilesOpened}`)
+  if(this.gameService.testMode)  console.log(`Auto Solving - tile opened: ${tilesOpened}`)
     if(tilesOpened){
       setTimeout(() => {
         this.autoSolve(0,false,level);

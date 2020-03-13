@@ -103,7 +103,7 @@ export class GameService {
   public openTile(tileX: number, tileY: number): void {
     if (tileX < 0) tileX = 0;
     if (tileY < 0) tileY = 0
-    console.log(`open ${tileX} ${tileY}`)
+    if(this.testMode)console.log(`open ${tileX} ${tileY}`)
     if(Number.isNaN(tileX) || Number.isNaN(tileY))return;
     this.wsService.sendMessage(`${API.API_OPEN_COMMAND} ${tileX} ${tileY}`);
   }
@@ -122,7 +122,7 @@ export class GameService {
 
   public parseMessage(message: string): void {
     if (message.indexOf(API.API_NEW_LEVEL_KEYWORD) >= 0) {
-      console.log(message)
+    if(this.testMode)  console.log(message)
     } else if (message.indexOf("□") >= 0) {
       if (this.requestedLevel <= 2) {
         this.parseMapData(message);
@@ -132,10 +132,10 @@ export class GameService {
     } else if (message.indexOf(API.API_OPEN_COMMAND) >= 0) {
         this.getMap()
       if (message.indexOf(API.API_LOST_MESSAGE) >= 0) {
-        console.log(message)
+        if(this.testMode)console.log(message)
         this.resetGame(false);
       } else if (message.indexOf(API.API_WON_MESSAGE) >= 0) {
-        console.log(message)
+        if(this.testMode)console.log(message)
         var password = message.split(":")[2];
         this.passwords.push(password);
         this.resetGame(true);

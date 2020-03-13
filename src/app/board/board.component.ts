@@ -30,7 +30,7 @@ export class BoardComponent implements OnInit {
   autoSolveStatus:string = "Auto Solve";
 
 
-  constructor(private gameService: GameService, private gamesolver: GamesolverService) {
+  constructor(public gameService: GameService, public gamesolver: GamesolverService) {
 
   }
 

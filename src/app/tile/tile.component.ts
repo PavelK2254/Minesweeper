@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { GameService } from '../gameService.service';
+
 
 
 @Component({
@@ -13,7 +13,7 @@ export class TileComponent implements OnInit {
   @Input('coordinate-x') x: number;
   @Input('coordinate-y') y: number;
 
-  constructor(private gameService: GameService) {
+  constructor() {
 
   }
 

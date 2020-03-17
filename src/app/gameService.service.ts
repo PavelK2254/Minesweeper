@@ -202,7 +202,7 @@ export class GameService {
       worker.onmessage = ({ data }) => {
         console.log(`page got message: ${data}`);
       };
-      worker.postMessage('hello');
+      worker.postMessage([this.plainText,this.flaggedTileIndexes]);
     } else {
       // Web Workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.

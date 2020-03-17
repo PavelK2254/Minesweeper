@@ -84,15 +84,20 @@ export class BoardComponent implements OnInit {
   }
 
   toggleAutoSolve() {
-    if(this.gameService.autoSolveWorking){
-      this.gameService.autoSolveWorking = false
-      this.autoSolveStatus = "Auto Solve";
-      this.gamesolver.stopSolving();
+    if(this.currentLevel > 2){
+      this.gameService.computeAutoSolve();
     }else{
-      this.gameService.autoSolveWorking = true
-    this.autoSolveStatus = "Stop";
-    this.gamesolver.autoSolve(0,false,this.gameService.requestedLevel);
+      if(this.gameService.autoSolveWorking){
+        this.gameService.autoSolveWorking = false
+        this.autoSolveStatus = "Auto Solve";
+        this.gamesolver.stopSolving();
+      }else{
+        this.gameService.autoSolveWorking = true
+      this.autoSolveStatus = "Stop";
+      this.gamesolver.autoSolve(0,false,this.gameService.requestedLevel);
+      }
     }
+
 
   }
 }

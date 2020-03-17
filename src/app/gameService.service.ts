@@ -13,6 +13,7 @@ import { WebsocketService } from './websocket.service';
 })
 export class GameService {
 
+
   gameStatusTitle = "Game In Progress";
   requestedLevel = 0;
   testMode = false;
@@ -193,6 +194,19 @@ export class GameService {
 
   }
 
-
+  computeAutoSolve() {
+    console.log("auto solve")
+    if (typeof Worker !== 'undefined') {
+      // Create a news
+      const worker = new Worker('./game-service.worker', { type: 'module' });
+      worker.onmessage = ({ data }) => {
+        console.log(`page got message: ${data}`);
+      };
+      worker.postMessage('hello');
+    } else {
+      // Web Workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
+    }
+  }
 
 }

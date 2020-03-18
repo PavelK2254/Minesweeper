@@ -49,14 +49,16 @@ export class BoardComponent implements OnInit {
     } else {
       console.log(`Index: ${this.getSelectionPosition()} X: ${this.gameService.getTileX(this.getSelectionPosition())} Y: ${this.gameService.getTileY(this.getSelectionPosition())}`);
       element = this.getSelectionPosition();
-      var x: number;
+    /*  var x: number;
       if (this.gameService.getTileY(element) > 0) {
         x = this.gameService.getTileX(element) - (this.gameService.getTileY(element))
       } else {
         x = this.gameService.getTileX(element)
-      }
-      this.gameService.openTile(x, this.gameService.getTileY(element));
+      }*/
+      this.gameService.openTile(this.gameService.getTileX(element), this.gameService.getTileY(element));
+      this.gameService.getMap()
     }
+
   }
 
 
@@ -85,7 +87,16 @@ export class BoardComponent implements OnInit {
 
   toggleAutoSolve() {
     if(this.currentLevel > 2){
+      if(this.gameService.autoSolveWorking){
+        this.gameService.autoSolveWorking = false
+        this.autoSolveStatus = "Auto Solve";
+        this.gameService.stopSolving();
+      }else{
+        this.gameService.autoSolveWorking = true
+      this.autoSolveStatus = "Stop";
       this.gameService.computeAutoSolve();
+      }
+
     }else{
       if(this.gameService.autoSolveWorking){
         this.gameService.autoSolveWorking = false

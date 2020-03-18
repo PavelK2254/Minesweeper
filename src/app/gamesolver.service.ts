@@ -54,7 +54,7 @@ export class GamesolverService {
     } else if (currentCell.hasMinesAround()) {
       currentCell.getUnopenedTiles().forEach((item) => {
         if (!this.gameService.isTileFlagged(item)){
-          this.gameService.flagMine(item);
+          this.gameService.flagMine(item,false);
           tilesOpened = true;
         }
       })

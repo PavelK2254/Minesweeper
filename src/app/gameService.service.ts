@@ -14,6 +14,7 @@ import { WebsocketService } from './websocket.service';
 export class GameService {
 
 
+
   gameStatusTitle = "Game In Progress";
   requestedLevel = 0;
   testMode = false;
@@ -30,6 +31,7 @@ export class GameService {
   public sendHelp(): void {
     this.wsService.sendMessage('help');
   }
+  activeInterval:any;
 
   public getNewLevel(level: number): void {
     this.requestedLevel = level;
@@ -131,7 +133,7 @@ export class GameService {
         this.plainText = message.trim();
       }
     } else if (message.indexOf(API.API_OPEN_COMMAND) >= 0) {
-        this.getMap()
+      //  this.getMap()
       if (message.indexOf(API.API_LOST_MESSAGE) >= 0) {
         if(this.testMode)console.log(message)
         this.resetGame(false);
@@ -175,13 +177,19 @@ export class GameService {
 
   }
 
-  public flagMine(index:number):void{
-    if(this.requestedLevel <= 2){
-    document.getElementsByTagName("app-tile")[index].querySelector("mat-card").classList.add("redBackground");
-    this.flaggedTileIndexes.push(index);
-  }else{
-    this.flaggedTileIndexes.push(index);
-  }
+  public flagMine(index:number,compensateEmptyTiles):void{
+    if(!compensateEmptyTiles){
+      if(this.requestedLevel <= 2){
+      document.getElementsByTagName("app-tile")[index].querySelector("mat-card").classList.add("redBackground");
+      this.flaggedTileIndexes.push(index);
+    }else{
+      this.flaggedTileIndexes.push(index);
+    }
+
+    }else{
+    //  this.flaggedTileIndexes.push(index - this.getTileY(index));
+      this.flaggedTileIndexes.push(index);
+    }
 
   }
 
@@ -200,13 +208,36 @@ export class GameService {
       // Create a news
       const worker = new Worker('./game-service.worker', { type: 'module' });
       worker.onmessage = ({ data }) => {
-        console.log(`page got message: ${data}`);
+      //  console.log(`page got message: ${data}`);
+        if(data.cmd == 'flag'){
+          data.payload.forEach(element => {
+              this.flagMine(element,true)
+          });
+        }else if(data.cmd == 'open'){
+          data.payload.forEach(element => {
+              this.openTile(element.x,element.y)
+          });
+        }else if(data.cmd == 'done'){
+          this.getMap();
+          if(this.autoSolveWorking)
+          setTimeout(() => {
+            worker.postMessage([this.plainText,this.flaggedTileIndexes]);
+          }, 1000);
+        }
+
       };
-      worker.postMessage([this.plainText,this.flaggedTileIndexes]);
+    //  this.activeInterval = setInterval(() => {
+        worker.postMessage([this.plainText,this.flaggedTileIndexes]);
+  //    },2000)
+
     } else {
       // Web Workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
     }
+  }
+
+  stopSolving() {
+    clearInterval(this.activeInterval);
   }
 
 }

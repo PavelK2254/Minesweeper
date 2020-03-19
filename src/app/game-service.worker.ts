@@ -125,11 +125,12 @@ addEventListener('message', ({ data }) => {
 });
 
 function solve(mapArray: Array<string>) {
+  var tilesToOpen = new Array<object>();
   mapArray.forEach((element, index,arr) => {
     cell.init(mapArray, index);
     var isSafeToOpenAround = cell.getSELF() != '0' && +cell.getSELF() - cell.getFlaggedTiles().length == 0
     if (isSafeToOpenAround) {
-      var tilesToOpen = new Array<object>();
+
       cell.getUnopenedTilesIndex().forEach((item, index, arr) => {
         if (cell.getFlaggedTiles().indexOf(item) < 0) {
           //console.log(`Open: X ${cell.getX()} Y ${cell.getY()}`)
@@ -140,9 +141,9 @@ function solve(mapArray: Array<string>) {
           tilesToOpen.push(tile);
         }
       });
-        setTimeout(() => {
+        /*setTimeout(() => {
       postMessage({ 'cmd': 'open', 'payload': tilesToOpen })
-    }, 500);
+    }, 500);*/
     } else if (cell.hasMinesAround()) {
       var flagTiles = new Array<number>();
       cell.getUnopenedTilesIndex().forEach(tile => {
@@ -156,7 +157,8 @@ function solve(mapArray: Array<string>) {
   //  }, 500);
 
 }else if(index == arr.length -1){
-  postMessage({'cmd':'done'})
+  postMessage({'cmd':'done','payload':tilesToOpen})
+  tilesToOpen.length = 0
 }
   });
 

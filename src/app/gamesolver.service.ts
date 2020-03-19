@@ -36,8 +36,8 @@ export class GamesolverService {
 
     this.gameService.busy = true;
     this.currentIndex = currentIndex;
-    var currentCell = new CellConfigModule(this.getCurrentIndex(),this.getColumnsCount(), this.gameService);
-
+    //var currentCell = new CellConfigModule(currentIndex,this.heightFactor, this.gameService);
+      var currentCell = new CellConfigModule(this.gameService);
 
     this.heightFactor = this.gameService.getMapHeight();
 
@@ -88,7 +88,7 @@ export class GamesolverService {
   }
 
   requestRestart(level:number){
-    this.gameService.getNewLevel(level);
+    this.gameService.updateLevel(level);
     setTimeout(() => {
       this.autoSolve(0,false,level)
     },1000)

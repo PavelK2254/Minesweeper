@@ -22,34 +22,34 @@ export class CellConfigModule {
   currentIndex: number;
   columnCount: number;
 
-  constructor(currentIndex: number,columnCount:number, gameService: GameService) {
+  constructor(gameService: GameService) {
     this.gameService = gameService;
-    this.currentIndex = currentIndex;
-    this.columnCount = columnCount;
-    this.UL = this.checkUL(currentIndex, columnCount);
+    this.currentIndex = 0;//currentIndex;
+    this.columnCount = 0//columnCount;
+    this.UL = this.checkUL(this.currentIndex, this.columnCount);
     //this.UL = ((currentIndex - columnCount) -1);
-    this.U = this.checkU(currentIndex, columnCount);
+    this.U = this.checkU(this.currentIndex, this.columnCount);
     //this.U = (currentIndex - columnCount)
-    this.UR = this.checkUR(currentIndex, columnCount);
+    this.UR = this.checkUR(this.currentIndex, this.columnCount);
     //this.UR = ((currentIndex - columnCount)+1)
 
-    this.L = this.checkL(currentIndex);
+    this.L = this.checkL(this.currentIndex);
     //  this.L = currentIndex - 1;
     this.SELF = gameService.getTileValue(this.currentIndex)
-    this.R = this.checkR(currentIndex, columnCount);
+    this.R = this.checkR(this.currentIndex, this.columnCount);
     //this.R = currentIndex + 1;
 
-    this.DL = this.checkDL(currentIndex, columnCount);
+    this.DL = this.checkDL(this.currentIndex, this.columnCount);
     //  this.DL = ((currentIndex + columnCount)-1);
-    this.D = this.checkD(currentIndex, columnCount);
+    this.D = this.checkD(this.currentIndex, this.columnCount);
     //this.D = currentIndex + columnCount;
-    this.DR = this.checkDR(currentIndex, columnCount);
+    this.DR = this.checkDR(this.currentIndex, this.columnCount);
 
 
     this.shouldSkip = Number.isNaN(this.SELF);
 
-    this.X = gameService.getTileX(currentIndex)
-    this.Y = gameService.getTileY(currentIndex)
+    this.X = gameService.getTileX(this.currentIndex)
+    this.Y = gameService.getTileY(this.currentIndex)
 
   if(this.gameService.testMode)  console.log(`X: ${this.X} Y: ${this.Y}
       \n UL: ${this.UL} U: ${this.U} UR: ${this.UR}\n

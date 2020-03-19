@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { API } from './API';
 import { WebsocketService } from './websocket.service';
-
+import { Observable,Observer } from 'rxjs';
 
 
 
@@ -28,12 +28,16 @@ export class GameService {
   isWon = false;
   autoSolveWorking = false;
   public rowsArray = new Array<string>();
+  mapListener: Observable<string>;
+  mapNotifier: any;
+  okListener: Observable<string>;
+  okNotifier: any;
   public sendHelp(): void {
     this.wsService.sendMessage('help');
   }
   activeInterval:any;
 
-  public getNewLevel(level: number): void {
+  public updateLevel(level: number): void {
     this.requestedLevel = level;
     this.rowsArray.length = 0;
     this.flaggedTileIndexes.length = 0;
@@ -42,6 +46,9 @@ export class GameService {
     this.gameStatusTitle = "Game In Progress";
     this.isLost = false;
     this.isWon = false;
+    this.mapListener.subscribe(map => {
+      this.plainText = map;
+    })
     this.getMap();
   }
 
@@ -77,6 +84,13 @@ export class GameService {
 
   constructor(private wsService: WebsocketService) {
     this.wsService.initSocket(this);
+    this.mapListener = new Observable(subscriber => {
+      this.mapNotifier = subscriber;
+    });
+
+    this.okListener = new Observable(oKsubscriber => {
+      this.okNotifier = oKsubscriber;
+    })
   }
 
   public getMapHeight(): number {
@@ -130,10 +144,19 @@ export class GameService {
       if (this.requestedLevel <= 2) {
         this.parseMapData(message);
       } else {
-        this.plainText = message.trim();
+      //  this.plainText = message.trim();
+        this.mapNotifier.next(message.trim())
+
       }
     } else if (message.indexOf(API.API_OPEN_COMMAND) >= 0) {
       //  this.getMap()
+          if(this.requestedLevel <= 2){
+            this.getMap()
+          }else{
+              if(this.okNotifier)
+              this.okNotifier.next('ok');
+          }
+
       if (message.indexOf(API.API_LOST_MESSAGE) >= 0) {
         if(this.testMode)console.log(message)
         this.resetGame(false);
@@ -214,21 +237,67 @@ export class GameService {
               this.flagMine(element,true)
           });
         }else if(data.cmd == 'open'){
-          data.payload.forEach(element => {
+          var payload = data.payload;
+
+        /*  data.payload.forEach((element,index) => {
+            setTimeout(() => {
               this.openTile(element.x,element.y)
-          });
+            }, 1000*index);
+          });*/
+          this.okListener.subscribe(ok =>{
+            if(payload.length > 0){
+              var element = payload.shift()
+              setTimeout(() => {
+                this.openTile(element.x,element.y)
+              }, 1000);
+            }else{
+
+            }
+          })
+          if(payload.length > 0){
+            var element = payload.shift()
+            setTimeout(() => {
+              this.openTile(element.x,element.y)
+            }, 1000);
+          }
+
         }else if(data.cmd == 'done'){
-          this.getMap();
-          if(this.autoSolveWorking)
-          setTimeout(() => {
-            worker.postMessage([this.plainText,this.flaggedTileIndexes]);
-          }, 1000);
+          var payload = data.payload;
+          this.okListener.subscribe(ok =>{
+            if(payload.length > 0){
+              var element = payload.shift()
+              setTimeout(() => {
+                this.openTile(element.x,element.y)
+              }, 4);
+            }else{
+              this.getMap()
+            }
+          })
+          if(payload.length > 0){
+            var element = payload.shift()
+            setTimeout(() => {
+              this.openTile(element.x,element.y)
+            }, 4);
+          }else{
+            this.getMap()
+          }
+
+          this.mapListener.subscribe(map =>{
+            this.plainText = map;
+            if(this.autoSolveWorking)
+            setTimeout(() => {
+              worker.postMessage([this.plainText,this.flaggedTileIndexes]);
+            }, 1000);
+          })
+        //  this.getMap();
+
         }
 
       };
-    //  this.activeInterval = setInterval(() => {
+
+        this.busy == true;
         worker.postMessage([this.plainText,this.flaggedTileIndexes]);
-  //    },2000)
+
 
     } else {
       // Web Workers are not supported in this environment.
@@ -237,7 +306,8 @@ export class GameService {
   }
 
   stopSolving() {
-    clearInterval(this.activeInterval);
+    this.autoSolveWorking = false;
+    this.busy = false;
   }
 
 }

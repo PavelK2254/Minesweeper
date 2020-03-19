@@ -13,7 +13,7 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <button mat-raised-button color="accent" (click)="this.gameService.getNewLevel(this.currentLevel)" [disabled]="this.currentLevel == this.gameService.requestedLevel">New level</button>
+      <button mat-raised-button color="accent" (click)="this.gameService.updateLevel(this.currentLevel)" [disabled]="this.currentLevel == this.gameService.requestedLevel">New level</button>
       <button *ngIf="this.gameService.testMode" mat-raised-button color="accent" (click)="this.gameService.getMap()">Get Map</button>
       <button  mat-raised-button color="accent" (click)="this.toggleAutoSolve()">{{autoSolveStatus}}</button>
       <mat-list class="passwords" role="list">Passwords:

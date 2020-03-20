@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { API } from './API';
 import { WebsocketService } from './websocket.service';
 import { Observable,Observer } from 'rxjs';
+import {environment} from '../environments/environment';
 
 
 
@@ -16,6 +17,7 @@ export class GameService {
 
 
   gameStatusTitle = "Game In Progress";
+  autoSolveStatus:string = "Auto Solve";
   requestedLevel = 0;
   testMode = false;
   passwords = []
@@ -239,14 +241,21 @@ export class GameService {
       this.gameWorker = new Worker('./game-service.worker', { type: 'module' });
       if(triesCounter > 3)console.error('triesCounter above 3')
       this.loseListener.subscribe(lose =>{
-        console.log('Lost')
-        clearTimeout(mainProcess)
-        this.gameWorker.terminate();
-        this.gameWorker = undefined
-        this.updateLevel(3);
-        setTimeout(() => {
-        this.computeAutoSolve()
-        }, 4000);
+        if(!environment.production){
+            this.autoSolveWorking = false
+            this.autoSolveStatus = "Auto solve";
+            return;
+        }else{
+          console.log('Lost')
+          clearTimeout(mainProcess)
+          this.gameWorker.terminate();
+          this.gameWorker = undefined
+          this.updateLevel(3);
+          setTimeout(() => {
+          this.computeAutoSolve()
+          }, 4000);
+        }
+
 
       })
       this.gameWorker.onmessage = ({ data }) => {

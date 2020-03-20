@@ -27,7 +27,7 @@ export class BoardComponent implements OnInit {
 
 
   currentLevel: number = 1;
-  autoSolveStatus:string = "Auto Solve";
+
 
 
   constructor(public gameService: GameService, public gamesolver: GamesolverService) {
@@ -89,22 +89,22 @@ export class BoardComponent implements OnInit {
     if(this.currentLevel > 2){
       if(this.gameService.autoSolveWorking){
         this.gameService.autoSolveWorking = false
-        this.autoSolveStatus = "Auto Solve";
+        this.gameService.autoSolveStatus = "Auto Solve";
         this.gameService.stopSolving();
       }else{
         this.gameService.autoSolveWorking = true
-      this.autoSolveStatus = "Stop";
+      this.gameService.autoSolveStatus = "Stop";
       this.gameService.computeAutoSolve();
       }
 
     }else{
       if(this.gameService.autoSolveWorking){
         this.gameService.autoSolveWorking = false
-        this.autoSolveStatus = "Auto Solve";
+        this.gameService.autoSolveStatus = "Auto Solve";
         this.gamesolver.stopSolving();
       }else{
         this.gameService.autoSolveWorking = true
-      this.autoSolveStatus = "Stop";
+      this.gameService.autoSolveStatus = "Stop";
       this.gamesolver.autoSolve(0,false,this.gameService.requestedLevel);
       }
     }

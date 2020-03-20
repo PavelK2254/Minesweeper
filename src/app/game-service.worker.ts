@@ -130,7 +130,6 @@ function solve(mapArray: Array<string>) {
     cell.init(mapArray, index);
     var isSafeToOpenAround = cell.getSELF() != '0' && +cell.getSELF() - cell.getFlaggedTiles().length == 0
     if (isSafeToOpenAround) {
-
       cell.getUnopenedTilesIndex().forEach((item, index, arr) => {
         if (cell.getFlaggedTiles().indexOf(item) < 0) {
           //console.log(`Open: X ${cell.getX()} Y ${cell.getY()}`)
@@ -141,9 +140,7 @@ function solve(mapArray: Array<string>) {
           tilesToOpen.push(tile);
         }
       });
-        /*setTimeout(() => {
-      postMessage({ 'cmd': 'open', 'payload': tilesToOpen })
-    }, 500);*/
+
     } else if (cell.hasMinesAround()) {
       var flagTiles = new Array<number>();
       cell.getUnopenedTilesIndex().forEach(tile => {

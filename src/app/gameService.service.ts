@@ -159,6 +159,7 @@ export class GameService {
 
       if (message.indexOf(API.API_LOST_MESSAGE) >= 0) {
         if(this.testMode)console.log(message)
+        //this.getMap()
         this.resetGame(false);
       } else if (message.indexOf(API.API_WON_MESSAGE) >= 0) {
         if(this.testMode)console.log(message)
@@ -227,10 +228,22 @@ export class GameService {
 
   computeAutoSolve() {
     console.log("auto solve")
+    if(this.isWon)return
+    if(this.isLost){
+      return
+    }
+    var triesCounter = 0;
     if (typeof Worker !== 'undefined') {
       // Create a news
       const worker = new Worker('./game-service.worker', { type: 'module' });
       worker.onmessage = ({ data }) => {
+        if(this.isWon){
+          this.autoSolveWorking = false;
+          return
+        }else if(this.isLost){
+          this.autoSolveWorking = false;
+          return
+        }
       //  console.log(`page got message: ${data}`);
         if(data.cmd == 'flag'){
           data.payload.forEach(element => {
@@ -238,28 +251,8 @@ export class GameService {
           });
         }else if(data.cmd == 'open'){
           var payload = data.payload;
-
-        /*  data.payload.forEach((element,index) => {
-            setTimeout(() => {
-              this.openTile(element.x,element.y)
-            }, 1000*index);
-          });*/
-          this.okListener.subscribe(ok =>{
-            if(payload.length > 0){
-              var element = payload.shift()
-              setTimeout(() => {
-                this.openTile(element.x,element.y)
-              }, 1000);
-            }else{
-
-            }
-          })
-          if(payload.length > 0){
-            var element = payload.shift()
-            setTimeout(() => {
-              this.openTile(element.x,element.y)
-            }, 1000);
-          }
+          this.openTile(payload.x,payload.y)
+          this.getMap();
 
         }else if(data.cmd == 'done'){
           var payload = data.payload;
@@ -275,18 +268,25 @@ export class GameService {
           })
           if(payload.length > 0){
             var element = payload.shift()
+            triesCounter = 0;
             setTimeout(() => {
               this.openTile(element.x,element.y)
             }, 4);
           }else{
-            this.getMap()
+            if(triesCounter > 3){
+              alert("out of options")
+            }else{
+              triesCounter++;
+              this.getMap()
+            }
+
           }
 
           this.mapListener.subscribe(map =>{
             this.plainText = map;
             if(this.autoSolveWorking)
             setTimeout(() => {
-              worker.postMessage([this.plainText,this.flaggedTileIndexes]);
+              worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
             }, 1000);
           })
         //  this.getMap();
@@ -296,7 +296,7 @@ export class GameService {
       };
 
         this.busy == true;
-        worker.postMessage([this.plainText,this.flaggedTileIndexes]);
+        worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
 
 
     } else {

@@ -125,25 +125,29 @@ addEventListener('message', ({ data }) => {
   var map: string = data[0];
   flaggedTileIndexes = data[1];
   var startGuessting = data[2];
-  numOfColumns = map.indexOf("\n", 2)
-  numOfItems = map.lastIndexOf(emptyCell);
-  while (map.indexOf("\n") >= 0) {
-    map = map.replace("\n", "");
-  }
-  var mapArray = map.split("");
-  leastMineProbability.index = 0
-  leastMineProbability.openedCount = 0
-  if (startGuessting) {
-    if(hasNumber(mapArray)){
-        predict(mapArray)
-    }else{
-      openRandom(mapArray)
+  if(map != undefined){
+    numOfColumns = map.indexOf("\n", 2)
+    numOfItems = map.lastIndexOf(emptyCell);
+    while (map.indexOf("\n") >= 0) {
+      map = map.replace("\n", "");
     }
+    var mapArray = map.split("");
+    leastMineProbability.index = 0
+    leastMineProbability.openedCount = 0
+    if (startGuessting) {
+      if(hasNumber(mapArray)){
+          predict(mapArray)
+      }else{
+        openRandom(mapArray)
+      }
 
-  } else {
-    solve(mapArray);
+    } else {
+      solve(mapArray);
+    }
+  }else{
+    postMessage({ 'cmd': 'done', 'payload': new Array() })
+
   }
-
 });
 
 function solve(mapArray: Array<string>) {
@@ -204,7 +208,7 @@ function predict(mapArray: Array<string>) {
     x: getTileX(winningIndex),
     y: getTileY(winningIndex)
   }
-  console.log(`Predicting X:${tile.x} Y:${tile.y}`)
+  //console.log(`Predicting X:${tile.x} Y:${tile.y}`)
   postMessage({ 'cmd': 'open', 'payload': tile })
 }
 
@@ -214,6 +218,6 @@ function openRandom(mapArray: Array<string>){
     x: getTileX(randomIndex),
     y: getTileY(randomIndex)
   }
-  console.log(`Random X:${tile.x} Y:${tile.y}`)
+  //console.log(`Random X:${tile.x} Y:${tile.y}`)
   postMessage({ 'cmd': 'open', 'payload': tile })
 }

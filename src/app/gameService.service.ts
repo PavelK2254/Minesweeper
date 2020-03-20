@@ -32,11 +32,13 @@ export class GameService {
   mapNotifier: any;
   okListener: Observable<string>;
   okNotifier: any;
+  loseListener: Observable<string>;
+  loseNotifier:any;
   public sendHelp(): void {
     this.wsService.sendMessage('help');
   }
   activeInterval:any;
-  worker = new Worker('./game-service.worker', { type: 'module' });
+  gameWorker;
 
   public updateLevel(level: number): void {
     this.requestedLevel = level;
@@ -47,9 +49,6 @@ export class GameService {
     this.gameStatusTitle = "Game In Progress";
     this.isLost = false;
     this.isWon = false;
-    this.mapListener.subscribe(map => {
-      this.plainText = map;
-    })
     this.getMap();
   }
 
@@ -85,13 +84,9 @@ export class GameService {
 
   constructor(private wsService: WebsocketService) {
     this.wsService.initSocket(this);
-    this.mapListener = new Observable(subscriber => {
-      this.mapNotifier = subscriber;
-    });
-
-    this.okListener = new Observable(oKsubscriber => {
-      this.okNotifier = oKsubscriber;
-    })
+    this.mapListener = new Observable(subscriber => this.mapNotifier = subscriber);
+    this.okListener = new Observable(oKsubscriber => this.okNotifier = oKsubscriber);
+    this.loseListener = new Observable(loseSubscriber => this.loseNotifier = loseSubscriber);
   }
 
   public getMapHeight(): number {
@@ -134,19 +129,24 @@ export class GameService {
     } else {
       this.isLost = true;
       this.gameStatusTitle = "You lost";
+      if(this.loseNotifier)this.loseNotifier.next('lost');
     }
-    this.getMap();
+  //  this.getMap();
   }
 
   public parseMessage(message: string): void {
     if (message.indexOf(API.API_NEW_LEVEL_KEYWORD) >= 0) {
     if(this.testMode)  console.log(message)
     } else if (message.indexOf("□") >= 0) {
+      this.plainText = message.trim()
       if (this.requestedLevel <= 2) {
         this.parseMapData(message);
       } else {
       //  this.plainText = message.trim();
+      if(this.mapNotifier != undefined){
         this.mapNotifier.next(message.trim())
+      }
+
 
       }
     } else if (message.indexOf(API.API_OPEN_COMMAND) >= 0) {
@@ -228,22 +228,33 @@ export class GameService {
   }
 
   computeAutoSolve() {
-    console.log("auto solve")
     if(this.isWon)return
     if(this.isLost){
       return
     }
+    var mainProcess: NodeJS.Timer;
     var triesCounter = 0;
     if (typeof Worker !== 'undefined') {
       // Create a news
+      this.gameWorker = new Worker('./game-service.worker', { type: 'module' });
       if(triesCounter > 3)console.error('triesCounter above 3')
-      this.worker.onmessage = ({ data }) => {
+      this.loseListener.subscribe(lose =>{
+        console.log('Lost')
+        clearTimeout(mainProcess)
+        this.gameWorker.terminate();
+        this.gameWorker = undefined
+        this.updateLevel(3);
+        setTimeout(() => {
+        this.computeAutoSolve()
+        }, 4000);
+
+      })
+      this.gameWorker.onmessage = ({ data }) => {
         if(this.isWon){
           this.autoSolveWorking = false;
           return
         }else if(this.isLost){
-          this.autoSolveWorking = false;
-          return
+
         }
       //  console.log(`page got message: ${data}`);
         if(data.cmd == 'flag'){
@@ -281,7 +292,7 @@ export class GameService {
           }else{
             if(triesCounter >= 3){
               //alert("out of options")
-              this.worker.postMessage([this.plainText,this.flaggedTileIndexes,true]);
+              this.gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,true]);
               triesCounter = 0
             }else{
               triesCounter++;
@@ -290,14 +301,7 @@ export class GameService {
 
           }
 
-          this.mapListener.subscribe(map =>{
-            this.plainText = map;
-            if(this.autoSolveWorking)
-            setTimeout(() => {
 
-              this.worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
-            }, 1000);
-          })
         //  this.getMap();
 
         }
@@ -305,8 +309,14 @@ export class GameService {
       };
 
         this.busy == true;
-        this.worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
-
+        this.gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
+        this.mapListener.subscribe(map =>{
+          this.plainText = map;
+        mainProcess = setTimeout(() => {
+            if(this.autoSolveWorking && this.gameWorker != undefined)
+            this.gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
+          }, 1000);
+        })
 
     } else {
       // Web Workers are not supported in this environment.

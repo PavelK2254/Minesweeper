@@ -14,6 +14,11 @@ function getTileY(currentIndex: number): number {
   return Math.floor(currentIndex / numOfColumns);
 }
 
+var leastMineProbability = {
+  index: 0,
+  openedCount: 0
+}
+
 
 var cell = {
   init: function(mapArray: Array<string>, index: number) {
@@ -33,7 +38,7 @@ var cell = {
     this.D = mapArray[this.currentIndex + numOfColumns] == undefined ? -1 : mapArray[this.currentIndex + numOfColumns];
     this.DR = getTileX(this.currentIndex) >= (numOfColumns - 1) || mapArray[this.currentIndex + numOfColumns] == undefined ? -1 : mapArray[(this.currentIndex + numOfColumns) + 1];
 
-  //  this.info();
+    //  this.info();
   },
   isUpLegit: function() {
     return getTileY(this.currentIndex) != 0;
@@ -111,53 +116,104 @@ var cell = {
   }
 }
 
+function hasNumber(myString) {
+  return /\d/.test(myString);
+}
+
 addEventListener('message', ({ data }) => {
   //console.log(data)
   var map: string = data[0];
   flaggedTileIndexes = data[1];
+  var startGuessting = data[2];
   numOfColumns = map.indexOf("\n", 2)
   numOfItems = map.lastIndexOf(emptyCell);
   while (map.indexOf("\n") >= 0) {
     map = map.replace("\n", "");
   }
   var mapArray = map.split("");
-  solve(mapArray);
+  leastMineProbability.index = 0
+  leastMineProbability.openedCount = 0
+  if (startGuessting) {
+    if(hasNumber(mapArray)){
+        predict(mapArray)
+    }else{
+      openRandom(mapArray)
+    }
+
+  } else {
+    solve(mapArray);
+  }
+
 });
 
 function solve(mapArray: Array<string>) {
   var tilesToOpen = new Array<object>();
-  mapArray.forEach((element, index,arr) => {
+  mapArray.forEach((element, index, arr) => {
     cell.init(mapArray, index);
     var isSafeToOpenAround = cell.getSELF() != '0' && +cell.getSELF() - cell.getFlaggedTiles().length == 0
+
     if (isSafeToOpenAround) {
+
       cell.getUnopenedTilesIndex().forEach((item, index, arr) => {
         if (cell.getFlaggedTiles().indexOf(item) < 0) {
           //console.log(`Open: X ${cell.getX()} Y ${cell.getY()}`)
           var tile = {
             x: getTileX(item),
-            y:getTileY(item)
+            y: getTileY(item)
           }
           tilesToOpen.push(tile);
         }
       });
 
     } else if (cell.hasMinesAround()) {
+
       var flagTiles = new Array<number>();
       cell.getUnopenedTilesIndex().forEach(tile => {
         if (cell.getFlaggedTiles().indexOf(tile) < 0) {
-          //console.log(`Flag: X ${getTileX(tile)} Y ${getTileY(tile)}`)
           flagTiles.push(tile + getTileY(tile))
         }
       });
-    //      setTimeout(() => {
+
       postMessage({ 'cmd': 'flag', 'payload': flagTiles })
-  //  }, 500);
 
-}else if(index == arr.length -1){
-  postMessage({'cmd':'done','payload':tilesToOpen})
-  tilesToOpen.length = 0
-}
+
+    } else if (index == arr.length - 1) {
+      postMessage({ 'cmd': 'done', 'payload': tilesToOpen })
+      tilesToOpen.length = 0
+    }
   });
+}
 
+function predict(mapArray: Array<string>) {
+  mapArray.forEach((element, index, arr) => {
+    cell.init(mapArray, index);
+    if (+cell.getSELF() > 0 && (cell.getUnopenedTilesIndex().length - cell.getFlaggedTiles().length) > +cell.getSELF()) {
+      leastMineProbability.index = index
+      leastMineProbability.openedCount = cell.getUnopenedTilesIndex().length - cell.getFlaggedTiles().length - parseInt(cell.getSELF());
+    }
+  });
+  cell.init(mapArray, leastMineProbability.index)
+  var possibleTiles = new Array<number>();
+  cell.getUnopenedTilesIndex().forEach(element => {
+    if (cell.getFlaggedTiles().indexOf(element)) {
+      possibleTiles.push(element);
+    }
+  });
+  var winningIndex = possibleTiles[Math.floor(Math.random() * possibleTiles.length)]
+  var tile = {
+    x: getTileX(winningIndex),
+    y: getTileY(winningIndex)
+  }
+  console.log(`Predicting X:${tile.x} Y:${tile.y}`)
+  postMessage({ 'cmd': 'open', 'payload': tile })
+}
 
+function openRandom(mapArray: Array<string>){
+  var randomIndex = Math.floor(Math.random() * mapArray.length -1)
+  var tile = {
+    x: getTileX(randomIndex),
+    y: getTileY(randomIndex)
+  }
+  console.log(`Random X:${tile.x} Y:${tile.y}`)
+  postMessage({ 'cmd': 'open', 'payload': tile })
 }

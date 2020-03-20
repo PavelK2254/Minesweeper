@@ -36,6 +36,7 @@ export class GameService {
     this.wsService.sendMessage('help');
   }
   activeInterval:any;
+  worker = new Worker('./game-service.worker', { type: 'module' });
 
   public updateLevel(level: number): void {
     this.requestedLevel = level;
@@ -235,8 +236,8 @@ export class GameService {
     var triesCounter = 0;
     if (typeof Worker !== 'undefined') {
       // Create a news
-      const worker = new Worker('./game-service.worker', { type: 'module' });
-      worker.onmessage = ({ data }) => {
+      if(triesCounter > 3)console.error('triesCounter above 3')
+      this.worker.onmessage = ({ data }) => {
         if(this.isWon){
           this.autoSolveWorking = false;
           return
@@ -250,6 +251,11 @@ export class GameService {
               this.flagMine(element,true)
           });
         }else if(data.cmd == 'open'){
+          triesCounter = 0
+          if(this.isLost || this.isWon){
+            this.autoSolveWorking = false;
+            return
+          }
           var payload = data.payload;
           this.openTile(payload.x,payload.y)
           this.getMap();
@@ -259,9 +265,9 @@ export class GameService {
           this.okListener.subscribe(ok =>{
             if(payload.length > 0){
               var element = payload.shift()
-              setTimeout(() => {
+            //  setTimeout(() => {
                 this.openTile(element.x,element.y)
-              }, 4);
+          //    }, 4);
             }else{
               this.getMap()
             }
@@ -269,12 +275,14 @@ export class GameService {
           if(payload.length > 0){
             var element = payload.shift()
             triesCounter = 0;
-            setTimeout(() => {
+          //  setTimeout(() => {
               this.openTile(element.x,element.y)
-            }, 4);
+        //    }, 4);
           }else{
-            if(triesCounter > 3){
-              alert("out of options")
+            if(triesCounter >= 3){
+              //alert("out of options")
+              this.worker.postMessage([this.plainText,this.flaggedTileIndexes,true]);
+              triesCounter = 0
             }else{
               triesCounter++;
               this.getMap()
@@ -286,7 +294,8 @@ export class GameService {
             this.plainText = map;
             if(this.autoSolveWorking)
             setTimeout(() => {
-              worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
+
+              this.worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
             }, 1000);
           })
         //  this.getMap();
@@ -296,7 +305,7 @@ export class GameService {
       };
 
         this.busy == true;
-        worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
+        this.worker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
 
 
     } else {

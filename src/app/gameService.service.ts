@@ -232,7 +232,7 @@ export class GameService {
     if(this.isLost){
       return
     }
-    var mainProcess: NodeJS.Timer;
+    var mainProcess:any;
     var triesCounter = 0;
     if (typeof Worker !== 'undefined') {
       // Create a news

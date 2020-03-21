@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from '../gameService.service';
-import { GamesolverService } from '../gamesolver.service';
+
 
 interface Level {
   value: string;
@@ -30,7 +30,7 @@ export class BoardComponent implements OnInit {
 
 
 
-  constructor(public gameService: GameService, public gamesolver: GamesolverService) {
+  constructor(public gameService: GameService) {
 
   }
 

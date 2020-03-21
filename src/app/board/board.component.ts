@@ -40,7 +40,9 @@ export class BoardComponent implements OnInit {
 
 
 
-
+  levelChanged(){
+    this.gameService.plainText = ""
+  }
 
   openTile(element: any) {
     if (typeof element == "number") {
@@ -49,31 +51,18 @@ export class BoardComponent implements OnInit {
     } else {
       console.log(`Index: ${this.getSelectionPosition()} X: ${this.gameService.getTileX(this.getSelectionPosition())} Y: ${this.gameService.getTileY(this.getSelectionPosition())}`);
       element = this.getSelectionPosition();
-    /*  var x: number;
-      if (this.gameService.getTileY(element) > 0) {
-        x = this.gameService.getTileX(element) - (this.gameService.getTileY(element))
-      } else {
-        x = this.gameService.getTileX(element)
-      }*/
       this.gameService.openTile(this.gameService.getTileX(element), this.gameService.getTileY(element));
-      this.gameService.getMap()
     }
-
+      this.gameService.getMap()
   }
 
 
 
   flagMine(event) {
-    if(this.currentLevel <=2){
-    event.target.classList.toggle('redBackground')
-  //  this.gameService.getMap();
-
-  }else{
     var currentTileIndex = this.getSelectionPosition();
     if(this.gameService.flaggedTileIndexes.indexOf(currentTileIndex) < 0)
     this.gameService.flaggedTileIndexes.push(currentTileIndex)
-  }
-  return false;
+    return false;
   }
 
   trackFn(index: number, item: string) {
@@ -86,7 +75,6 @@ export class BoardComponent implements OnInit {
   }
 
   toggleAutoSolve() {
-    if(this.currentLevel > 2){
       if(this.gameService.autoSolveWorking){
         this.gameService.autoSolveWorking = false
         this.gameService.autoSolveStatus = "Auto Solve";
@@ -94,21 +82,7 @@ export class BoardComponent implements OnInit {
       }else{
         this.gameService.autoSolveWorking = true
       this.gameService.autoSolveStatus = "Stop";
-      this.gameService.computeAutoSolve();
+      this.gameService.computeAutoSolve(this.currentLevel);
       }
-
-    }else{
-      if(this.gameService.autoSolveWorking){
-        this.gameService.autoSolveWorking = false
-        this.gameService.autoSolveStatus = "Auto Solve";
-        this.gamesolver.stopSolving();
-      }else{
-        this.gameService.autoSolveWorking = true
-      this.gameService.autoSolveStatus = "Stop";
-      this.gamesolver.autoSolve(0,false,this.gameService.requestedLevel);
-      }
-    }
-
-
   }
 }

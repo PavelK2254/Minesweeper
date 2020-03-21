@@ -23,7 +23,7 @@ export class GameService {
   passwords = []
   tiles = [];
   busy = false;
-  private plainText: string;
+  plainText: string;
   flaggedTileIndexes = new Array<number>();
   mineMarker = '#';
   isLost = false;
@@ -46,7 +46,7 @@ export class GameService {
     this.requestedLevel = level;
     this.rowsArray.length = 0;
     this.flaggedTileIndexes.length = 0;
-    this.plainText = undefined;
+    this.plainText = "";
     this.wsService.sendMessage(`${API.API_NEW_LEVEL_KEYWORD} ${level}`)
     this.gameStatusTitle = "Game In Progress";
     this.isLost = false;
@@ -105,14 +105,23 @@ export class GameService {
 
 
   public getTilesArray(): Array<String> {
-    if(this.requestedLevel <=2){
+  /*  if(this.requestedLevel <=2){
     var tilesArr = this.rowsArray.join('');
     this.tiles = tilesArr.split('')
     if (this.testMode) console.log(`Tiles: ${this.tiles.length}`)
     return this.tiles;
+  }else{*/
+    if(this.getPlainText()){
+      var plainTextInfiltered = this.getPlainText();
+      while (plainTextInfiltered.indexOf("\n") >= 0) {
+        plainTextInfiltered = plainTextInfiltered.replace("\n", "");
+      }
+    return plainTextInfiltered.split('');
   }else{
-    return this.getPlainText().split('');
+    return new Array<string>(0);
   }
+
+  //}
   }
 
   public openTile(tileX: number, tileY: number): void {
@@ -141,24 +150,24 @@ export class GameService {
     if(this.testMode)  console.log(message)
     } else if (message.indexOf("□") >= 0) {
       this.plainText = message.trim()
-      if (this.requestedLevel <= 2) {
-        this.parseMapData(message);
-      } else {
-      //  this.plainText = message.trim();
+      /*if (this.requestedLevel <= 2) {
+
+      } else {*/
+      this.parseMapData(message);
       if(this.mapNotifier != undefined){
         this.mapNotifier.next(message.trim())
       }
 
 
-      }
+  //    }
     } else if (message.indexOf(API.API_OPEN_COMMAND) >= 0) {
       //  this.getMap()
-          if(this.requestedLevel <= 2){
+          /*if(this.requestedLevel <= 2){
             this.getMap()
-          }else{
+          }else{*/
               if(this.okNotifier)
               this.okNotifier.next('ok');
-          }
+        //  }
 
       if (message.indexOf(API.API_LOST_MESSAGE) >= 0) {
         if(this.testMode)console.log(message)
@@ -229,7 +238,7 @@ export class GameService {
 
   }
 
-  computeAutoSolve() {
+  computeAutoSolve(level:number) {
     if(this.isWon)return
     if(this.isLost){
       return
@@ -241,7 +250,7 @@ export class GameService {
       this.gameWorker = new Worker('./game-service.worker', { type: 'module' });
       if(triesCounter > 3)console.error('triesCounter above 3')
       this.loseListener.subscribe(lose =>{
-        if(!environment.production){
+        if(environment.production){
             this.autoSolveWorking = false
             this.autoSolveStatus = "Auto solve";
             return;
@@ -250,9 +259,9 @@ export class GameService {
           clearTimeout(mainProcess)
           this.gameWorker.terminate();
           this.gameWorker = undefined
-          this.updateLevel(3);
+          this.updateLevel(level);
           setTimeout(() => {
-          this.computeAutoSolve()
+          this.computeAutoSolve(level)
           }, 4000);
         }
 

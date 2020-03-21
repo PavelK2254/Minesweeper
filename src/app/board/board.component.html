@@ -7,7 +7,7 @@
     <mat-card-subtitle style="margin-top:0">
       <mat-form-field>
         <mat-label>Current level:</mat-label>
-        <mat-select [(value)]="currentLevel">
+        <mat-select [(value)]="currentLevel" (selectionChange)="levelChanged()">
           <mat-option *ngFor="let level of levels" [value]="level.value">
             {{level.viewValue}}
           </mat-option>

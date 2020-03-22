@@ -8,4 +8,6 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Minesweeper';
+  linkedInUrl = "https://linkedin.com/in/pavel-koifman";
+  githubUrl = "https://github.com/PavelK2254";
 }

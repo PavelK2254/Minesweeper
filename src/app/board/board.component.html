@@ -23,7 +23,7 @@
     <mat-card-content>
       <mat-grid-list *ngIf="currentLevel <= 2" [cols]="this.gameService.getMapHeight()" rowHeight="1:1" class="board-content-field">
         <mat-grid-tile class="tile" *ngFor="let tile of this.gameService.getTilesArray(); index as i; trackBy: trackFn">
-          <app-tile (click)="openTile(i)" [coordinate-x]="this.gameService.getTileX(i)" [coordinate-y]="this.gameService.getTileY(i)" [tileLabel]="tile" (contextmenu)="flagMine($event)"></app-tile>
+          <app-tile (click)="openTile(i)" [coordinate-x]="this.gameService.getTileX(i)" [coordinate-y]="this.gameService.getTileY(i)" [tileLabel]="tile" (contextmenu)="flagMine(i)"></app-tile>
         </mat-grid-tile>
       </mat-grid-list>
 

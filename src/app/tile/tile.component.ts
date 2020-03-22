@@ -12,6 +12,7 @@ export class TileComponent implements OnInit {
   @Input() tileLabel: string;
   @Input('coordinate-x') x: number;
   @Input('coordinate-y') y: number;
+  @Input('index') index: number;
 
   constructor() {
 

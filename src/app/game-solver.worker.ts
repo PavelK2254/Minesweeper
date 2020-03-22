@@ -38,7 +38,6 @@ var cell = {
     this.D = mapArray[this.currentIndex + numOfColumns] == undefined ? -1 : mapArray[this.currentIndex + numOfColumns];
     this.DR = getTileX(this.currentIndex) >= (numOfColumns - 1) || mapArray[this.currentIndex + numOfColumns] == undefined ? -1 : mapArray[(this.currentIndex + numOfColumns) + 1];
 
-    //  this.info();
   },
   isUpLegit: function() {
     return getTileY(this.currentIndex) != 0;
@@ -81,7 +80,6 @@ var cell = {
     result += this.D == emptyCell || this.D == mine ? 1 : 0;
     result += this.DR == emptyCell || this.DR == mine ? 1 : 0;
 
-    //  console.log(`Sum of Unopened ${result}`)
     return result;
   },
 
@@ -108,7 +106,6 @@ var cell = {
     var flaggedTiles = new Array<number>();
     this.getUnopenedTilesIndex().forEach(item => {
       if (flaggedTileIndexes.indexOf(item + getTileY(item)) >= 0) {
-        //console.log(`Flagged: X: ${this.gameService.getTileX(item)} Y: ${this.gameService.getTileY(item)}`)
         flaggedTiles.push(item)
       }
     });
@@ -121,11 +118,10 @@ function hasNumber(myString) {
 }
 
 addEventListener('message', ({ data }) => {
-  //console.log(data)
   var map: string = data[0];
   flaggedTileIndexes = data[1];
   var startGuessting = data[2];
-  if(map != undefined){
+  if (map != undefined) {
     numOfColumns = map.indexOf("\n", 2)
     numOfItems = map.lastIndexOf(emptyCell);
     while (map.indexOf("\n") >= 0) {
@@ -135,18 +131,16 @@ addEventListener('message', ({ data }) => {
     leastMineProbability.index = 0
     leastMineProbability.openedCount = 0
     if (startGuessting) {
-      if(hasNumber(mapArray)){
-          predict(mapArray)
-      }else{
+      if (hasNumber(mapArray)) {
+        predict(mapArray)
+      } else {
         openRandom(mapArray)
       }
-
     } else {
       solve(mapArray);
     }
-  }else{
+  } else {
     postMessage({ 'cmd': 'done', 'payload': new Array() })
-
   }
 });
 
@@ -154,13 +148,10 @@ function solve(mapArray: Array<string>) {
   var tilesToOpen = new Array<object>();
   mapArray.forEach((element, index, arr) => {
     cell.init(mapArray, index);
-    var isSafeToOpenAround = cell.getSELF() != '0' && +cell.getSELF() - cell.getFlaggedTiles().length == 0
-
+    var isSafeToOpenAround = cell.getSELF() != '0' && +cell.getSELF() - cell.getFlaggedTiles().length == 0;
     if (isSafeToOpenAround) {
-
       cell.getUnopenedTilesIndex().forEach((item, index, arr) => {
         if (cell.getFlaggedTiles().indexOf(item) < 0) {
-          //console.log(`Open: X ${cell.getX()} Y ${cell.getY()}`)
           var tile = {
             x: getTileX(item),
             y: getTileY(item)
@@ -168,19 +159,14 @@ function solve(mapArray: Array<string>) {
           tilesToOpen.push(tile);
         }
       });
-
     } else if (cell.hasMinesAround()) {
-
       var flagTiles = new Array<number>();
       cell.getUnopenedTilesIndex().forEach(tile => {
         if (cell.getFlaggedTiles().indexOf(tile) < 0) {
           flagTiles.push(tile + getTileY(tile))
         }
       });
-
       postMessage({ 'cmd': 'flag', 'payload': flagTiles })
-
-
     } else if (index == arr.length - 1) {
       postMessage({ 'cmd': 'done', 'payload': tilesToOpen })
       tilesToOpen.length = 0
@@ -208,16 +194,14 @@ function predict(mapArray: Array<string>) {
     x: getTileX(winningIndex),
     y: getTileY(winningIndex)
   }
-  //console.log(`Predicting X:${tile.x} Y:${tile.y}`)
   postMessage({ 'cmd': 'open', 'payload': tile })
 }
 
-function openRandom(mapArray: Array<string>){
-  var randomIndex = Math.floor(Math.random() * mapArray.length -1)
+function openRandom(mapArray: Array<string>) {
+  var randomIndex = Math.floor(Math.random() * mapArray.length - 1)
   var tile = {
     x: getTileX(randomIndex),
     y: getTileY(randomIndex)
   }
-  //console.log(`Random X:${tile.x} Y:${tile.y}`)
   postMessage({ 'cmd': 'open', 'payload': tile })
 }

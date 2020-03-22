@@ -50,7 +50,7 @@ export class BoardComponent implements OnInit {
       this.gameService.openTile(this.gameService.getTileX(element), this.gameService.getTileY(element));
     } else {
       console.log(`Index: ${this.getSelectionPosition()} X: ${this.gameService.getTileX(this.getSelectionPosition())} Y: ${this.gameService.getTileY(this.getSelectionPosition())}`);
-      element = this.getSelectionPosition();
+      element = this.getSelectionPosition() - this.gameService.getTileY(this.getSelectionPosition());
       this.gameService.openTile(this.gameService.getTileX(element), this.gameService.getTileY(element));
     }
       this.gameService.getMap()
@@ -58,8 +58,13 @@ export class BoardComponent implements OnInit {
 
 
 
-  flagMine(event) {
-    var currentTileIndex = this.getSelectionPosition();
+  flagMine(index) {
+    var currentTileIndex;
+    if(this.currentLevel <= 2){
+    currentTileIndex = index + this.gameService.getTileY(index);
+    }else{
+    currentTileIndex = this.getSelectionPosition();
+    }
     if(this.gameService.flaggedTileIndexes.indexOf(currentTileIndex) < 0)
     this.gameService.flaggedTileIndexes.push(currentTileIndex)
     return false;

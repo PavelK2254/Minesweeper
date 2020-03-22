@@ -1,27 +1,14 @@
 # Minesweeper
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.24.
+Angular 6 project featuring a Minesweeper game connected to [Evolution Gaming's](https://www.evolutiongaming.com/) web socket. Hosted at [https://minesweeper-25d3f.web.app/](https://minesweeper-25d3f.web.app/)
 
-## Development server
+## Gameplay Instuctions
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1. Choose a level.
+2. Click `New Level` button.
+3. Left click on a tile to open in or Right click to flag it as a bomb
+4. Click `Auto Solve` to let the AI solve the level
 
-## Code scaffolding
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Contacts
+Contact me at [pavel4567@gmail.com](mailto:pavel4567@gmail.com) for any questions

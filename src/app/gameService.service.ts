@@ -40,7 +40,7 @@ export class GameService {
     this.wsService.sendMessage('help');
   }
   activeInterval:any;
-  gameWorker;
+
 
   public updateLevel(level: number): void {
     this.requestedLevel = level;
@@ -137,6 +137,8 @@ export class GameService {
     if (won) {
       this.gameStatusTitle = "You have Won!!!";
       this.isWon = true;
+      this.autoSolveWorking = false;
+      alert("Finally won!")
     } else {
       this.isLost = true;
       this.gameStatusTitle = "You lost";
@@ -247,27 +249,21 @@ export class GameService {
     var triesCounter = 0;
     if (typeof Worker !== 'undefined') {
       // Create a news
-      this.gameWorker = new Worker('./game-service.worker', { type: 'module' });
+      let gameWorker = new Worker('./game-service.worker', { type: 'module' });
       if(triesCounter > 3)console.error('triesCounter above 3')
       this.loseListener.subscribe(lose =>{
-        if(environment.production){
-            this.autoSolveWorking = false
-            this.autoSolveStatus = "Auto solve";
-            return;
-        }else{
           console.log('Lost')
           clearTimeout(mainProcess)
-          this.gameWorker.terminate();
-          this.gameWorker = undefined
+          if(gameWorker){
+            gameWorker.terminate();
+            gameWorker = undefined
+          }
           this.updateLevel(level);
           setTimeout(() => {
           this.computeAutoSolve(level)
           }, 4000);
-        }
-
-
       })
-      this.gameWorker.onmessage = ({ data }) => {
+      gameWorker.onmessage = ({ data }) => {
         if(this.isWon){
           this.autoSolveWorking = false;
           return
@@ -310,7 +306,7 @@ export class GameService {
           }else{
             if(triesCounter >= 3){
               //alert("out of options")
-              this.gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,true]);
+              gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,true]);
               triesCounter = 0
             }else{
               triesCounter++;
@@ -327,12 +323,12 @@ export class GameService {
       };
 
         this.busy == true;
-        this.gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
+        gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
         this.mapListener.subscribe(map =>{
-          this.plainText = map;
+          this.plainText = map.trim();
         mainProcess = setTimeout(() => {
-            if(this.autoSolveWorking && this.gameWorker != undefined)
-            this.gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
+            if(this.autoSolveWorking && gameWorker != undefined)
+            gameWorker.postMessage([this.plainText,this.flaggedTileIndexes,false]);
           }, 1000);
         })
 
